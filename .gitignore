@@ -1,6 +1,7 @@
-# Ingnore venvs and API key text file
+# Ingnore venvs and all data in files folder
 py311_*
-api_key.txt
+files/
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

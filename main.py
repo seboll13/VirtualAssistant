@@ -2,7 +2,7 @@ import os
 import openai
 import speech_recognition as sr
 
-openai.api_key_path = 'api_key.txt'
+openai.api_key_path = 'files/api_key.txt'
 STD_ERROR_MESSAGE   = "Could not understand audio"
 
 
@@ -37,7 +37,7 @@ def speak_text(text) -> None:
     os.system(f'gtts-cli "{text}" | mpg123 -')
 
 
-def engage_conversation(recogniser) -> None:
+def engage_conversation_with_gpt(recogniser) -> None:
     """Engages a new conversation with the VA"""
     speak_text('What can I do for you ?')
     with sr.Microphone() as source:
@@ -52,17 +52,32 @@ def engage_conversation(recogniser) -> None:
             print(STD_ERROR_MESSAGE)
 
 
+def engage_assisting_process(recogniser) -> None:
+    """Engages a process of home assistant"""
+    speak_text('Yes ?')
+    with sr.Microphone() as source:
+        audio = recogniser.listen(source)
+        try:
+            text = recogniser.recognize_google(audio)
+            if "Hall light on" in text:
+                pass
+        except sr.UnknownValueError:
+            print(STD_ERROR_MESSAGE)
+
+
 def main():
     """Main function"""
-    print("Say 'VA' to activate the virtual assistant")
+    print("Say something...")
     while True:
         with sr.Microphone() as source:
             recogniser = sr.Recognizer()
             audio = recogniser.listen(source)
             try:
                 text = recogniser.recognize_google(audio)
-                if text == "VA":
-                    engage_conversation(recogniser)
+                if "VA" in text:
+                    engage_conversation_with_gpt(recogniser)
+                elif "Home" in text:
+                    engage_assisting_process(recogniser)
                 elif text == "exit":
                     print("Exiting...")
                     break
